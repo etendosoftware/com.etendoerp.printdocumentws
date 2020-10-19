@@ -13,9 +13,8 @@ import org.openbravo.base.exception.OBException;
 import org.openbravo.base.structure.BaseOBObject;
 import org.openbravo.erpCommon.utility.reporting.DocumentType;
 import org.openbravo.erpCommon.utility.reporting.ReportManager;
+import org.openbravo.model.common.enterprise.DocumentTemplate;
 import org.openbravo.service.db.DalConnectionProvider;
-
-import com.openbravo.gps.printandsend.Obpas_printsend_template;
 
 public class PrintDocument extends com.smf.ws.printdocument.PrintDocument {
 
@@ -98,9 +97,9 @@ public class PrintDocument extends com.smf.ws.printdocument.PrintDocument {
       String templateLocation = "";
 
       // Obtain custom template location and filename
-      for (Obpas_printsend_template temp : docType.getObpasPrintsendTemplateList()) {
+      for (DocumentTemplate temp : docType.getDocumentTemplateList()) {
         if (temp.isActive()) {
-          templateLocation = temp.getTemplatefilelocation();
+          templateLocation = temp.getTemplateLocation();
           break;
         }
       }

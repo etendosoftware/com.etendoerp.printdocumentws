@@ -2,7 +2,7 @@
  <provider>
    <bean>
        <name>printDocument</name>
-       <class>com.smf.gloria.printdocumentws.PrintDocument</class>
+       <class>com.etendoerp.printdocumentws.PrintDocument</class>
        <singleton>true</singleton>
    </bean>
  </provider>

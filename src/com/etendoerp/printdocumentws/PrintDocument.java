@@ -1,4 +1,4 @@
-package com.smf.gloria.printdocumentws;
+package com.etendoerp.printdocumentws;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import org.openbravo.service.db.DalConnectionProvider;
 
 public class PrintDocument extends com.smf.ws.printdocument.PrintDocument {
 
-  public final List<BaseOBObject> customDocuments = new ArrayList<BaseOBObject>();
+  public final List<BaseOBObject> customDocuments = new ArrayList<>();
 
   @Override
   public void doGet(String path, HttpServletRequest request, HttpServletResponse response)
@@ -59,28 +59,28 @@ public class PrintDocument extends com.smf.ws.printdocument.PrintDocument {
     if ((documents == null || documents.size() == 0)
         && (customDocuments == null || customDocuments.size() == 0)) {
       String errorMessage = "";
-      errorMessage = "No se pudo encontrar el documento. \n";
+      errorMessage = "The document could not be found. \n";
       if (orderNumber != null) {
-        errorMessage = errorMessage + "Pedido de Venta: " + orderNumber + "\n";
+        errorMessage = errorMessage + "Order Document Number: " + orderNumber + "\n";
       }
       if (shipmentNumber != null) {
-        errorMessage = errorMessage + "Albarán: " + shipmentNumber + "\n";
+        errorMessage = errorMessage + "Shipment/Receipt Document Number: " + shipmentNumber + "\n";
       }
       if (invoiceNumber != null) {
-        errorMessage = errorMessage + "Factura: " + invoiceNumber + "\n";
+        errorMessage = errorMessage + "Invoice Document Number: " + invoiceNumber + "\n";
       }
       if (quotationNumber != null) {
-        errorMessage = errorMessage + "Presupuesto: " + quotationNumber + "\n";
+        errorMessage = errorMessage + "Quotation Document Number: " + quotationNumber + "\n";
       }
       if (orderProformaNumber != null) {
-        errorMessage = errorMessage + "Factura Proforma (pedido de venta): " + orderProformaNumber
+        errorMessage = errorMessage + "Proforma Invoice (Sales Order): " + orderProformaNumber
             + "\n";
       }
       if (shipmentValuedNumber != null) {
-        errorMessage = errorMessage + "Albarán Valorado (Cliente): " + shipmentValuedNumber + "\n";
+        errorMessage = errorMessage + "Valued Delivery Note (Customer): " + shipmentValuedNumber + "\n";
       }
       if (quotationProformaNumber != null) {
-        errorMessage = errorMessage + "Factura Proforma (presupuesto): " + quotationProformaNumber
+        errorMessage = errorMessage + "Proforma Invoice (budget): " + quotationProformaNumber
             + "\n";
       }
       throw new OBException(errorMessage);

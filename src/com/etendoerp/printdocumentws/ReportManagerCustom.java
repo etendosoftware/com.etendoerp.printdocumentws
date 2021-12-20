@@ -1,4 +1,4 @@
-package com.smf.gloria.printdocumentws;
+package com.etendoerp.printdocumentws;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;

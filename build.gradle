@@ -1,0 +1,7 @@
+group = 'com.etendoerp'
+version = '1.0.0'
+description = 'WebService for print sales documents'
+ 
+dependencies{
+    //Add dependencies here
+}

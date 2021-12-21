@@ -1,0 +1,15 @@
+group = 'com.etendoerp'
+version = '1.0.0'
+description = 'WebService for print sales documents'
+ 
+dependencies{
+    compile 'com.smf:ws.printdocument:[1.0.0,)@zip'
+}
+
+publishing{
+    repositories {
+        maven {
+            url "https://repo.futit.cloud/repository/maven-releases"
+        }
+    }
+}

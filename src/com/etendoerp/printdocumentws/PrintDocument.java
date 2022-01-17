@@ -7,6 +7,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.openbravo.base.ConfigParameters;
 import org.openbravo.base.HttpBaseUtils;
 import org.openbravo.base.exception.OBException;
@@ -32,24 +33,29 @@ public class PrintDocument extends com.smf.ws.printdocument.PrintDocument {
     final String orderProformaNumber = request.getParameter("orderProforma");
     final String shipmentValuedNumber = request.getParameter("shipmentValued");
     final String quotationProformaNumber = request.getParameter("quotationProforma");
+    final String orgId = request.getParameter("organization");
     final String isPurchase = request.getParameter("purchase");
 
-    fillDocuments(orderNumber, invoiceNumber, shipmentNumber, quotationNumber, isPurchase);
+    if (orgId == null || StringUtils.isEmpty(orgId)){
+      throw new OBException("El parámetro 'organization' es obligatorio y no puede ser vacío.");
+    }
+
+    fillDocuments(orderNumber, invoiceNumber, shipmentNumber, quotationNumber, orgId, isPurchase);
     if (documents != null && documents.size() > 0) {
       generateDocuments(request, response, documents, false);
     }
 
     if (orderProformaNumber != null) {
       documentType = DocumentType.SALESORDER;
-      customDocuments.addAll(getOrder(orderProformaNumber, isPurchase));
+      customDocuments.addAll(getOrder(orderProformaNumber, orgId,isPurchase));
     }
     if (shipmentValuedNumber != null) {
       documentType = DocumentType.SHIPMENT;
-      customDocuments.addAll(getShipment(shipmentValuedNumber, isPurchase));
+      customDocuments.addAll(getShipment(shipmentValuedNumber, orgId,isPurchase));
     }
     if (quotationProformaNumber != null) {
       documentType = DocumentType.QUOTATION;
-      customDocuments.addAll(getQuotation(quotationProformaNumber, isPurchase));
+      customDocuments.addAll(getQuotation(quotationProformaNumber, orgId, isPurchase));
     }
 
     if (customDocuments != null && customDocuments.size() > 0) {

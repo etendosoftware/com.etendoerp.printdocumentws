@@ -1,7 +1,60 @@
-group = 'com.etendoerp'
-version = '1.0.100'
-description = 'WebService for print sales documents'
- 
-dependencies{
-    //Add dependencies here
+/**
+*   This file was generated automatically by the 'createModuleBuild' task.
+*   Created at: 2022-04-05T18:49:21.118440Z.
+*
+*   WARNING: Do not put your credentials directly in this file.
+*
+*/
+
+group          = "com.etendoerp"
+version        = "1.0.100"
+description    = "WebService for print transaction documents"
+ext.artifact   = "printdocumentws"
+ext.repository = "https://repo.futit.cloud/repository/maven-releases"
+
+configurations {
+    moduleDependencyContainer
+}
+
+publishing {
+    publications {
+        "com.etendoerp.printdocumentws"(MavenPublication) {
+            from components.java
+            groupId    = group
+            artifactId = artifact
+            version    = version
+        }
+    }
+    repositories {
+        maven {
+            url "https://repo.futit.cloud/repository/maven-releases"
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://repo.futit.cloud/repository/maven-releases"
+    }
+    maven {
+        url "https://repo.futit.cloud/repository/maven-releases"
+    }
+    maven {
+        url "https://repo.futit.cloud/repository/maven-public-releases"
+    }
+    maven {
+        url "https://repo.futit.cloud/repository/maven-public-jars"
+    }
+}
+
+/**
+* Declare Java dependencies using 'implementation'
+* Ex: implementation "com.sun.mail:javax.mail:1.6.2"
+*/
+dependencies {
+
+   implementation('com.smf:ws.printdocument:1.0.100') 
+   implementation('com.etendoerp.platform:etendo-core:[22.1.0, 22.2.0)') 
+
 }

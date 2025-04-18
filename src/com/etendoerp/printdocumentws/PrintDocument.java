@@ -7,7 +7,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openbravo.base.ConfigParameters;
 import org.openbravo.base.HttpBaseUtils;
 import org.openbravo.base.exception.OBException;

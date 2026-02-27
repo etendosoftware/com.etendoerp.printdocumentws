@@ -52,6 +52,18 @@ import org.openbravo.model.common.enterprise.DocumentTemplate;
 @ExtendWith(MockitoExtension.class)
 class PrintDocumentTest {
 
+  private static final String PARAM_ORDER = "order";
+  private static final String PARAM_INVOICE = "invoice";
+  private static final String PARAM_SHIPMENT = "shipment";
+  private static final String PARAM_QUOTATION = "quotation";
+  private static final String PARAM_ORDER_PROFORMA = "orderProforma";
+  private static final String PARAM_SHIPMENT_VALUED = "shipmentValued";
+  private static final String PARAM_QUOTATION_PROFORMA = "quotationProforma";
+  private static final String PARAM_ORGANIZATION = "organization";
+  private static final String PARAM_PURCHASE = "purchase";
+  private static final String DOC_ORD_001 = "ORD-001";
+  private static final String ORG_1 = "ORG-1";
+
   @Mock
   private HttpServletRequest mockRequest;
 
@@ -71,19 +83,19 @@ class PrintDocumentTest {
    */
   @Test
   void testDoGetThrowsWhenOrganizationIsNull() {
-    when(mockRequest.getParameter("order")).thenReturn(null);
-    when(mockRequest.getParameter("invoice")).thenReturn(null);
-    when(mockRequest.getParameter("shipment")).thenReturn(null);
-    when(mockRequest.getParameter("quotation")).thenReturn(null);
-    when(mockRequest.getParameter("orderProforma")).thenReturn(null);
-    when(mockRequest.getParameter("shipmentValued")).thenReturn(null);
-    when(mockRequest.getParameter("quotationProforma")).thenReturn(null);
-    when(mockRequest.getParameter("organization")).thenReturn(null);
-    when(mockRequest.getParameter("purchase")).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn(null);
 
     OBException ex = assertThrows(OBException.class,
         () -> printDocument.doGet("", mockRequest, mockResponse));
-    assertTrue(ex.getMessage().contains("organization"));
+    assertTrue(ex.getMessage().contains(PARAM_ORGANIZATION));
   }
 
   /**
@@ -91,19 +103,19 @@ class PrintDocumentTest {
    */
   @Test
   void testDoGetThrowsWhenOrganizationIsEmpty() {
-    when(mockRequest.getParameter("order")).thenReturn(null);
-    when(mockRequest.getParameter("invoice")).thenReturn(null);
-    when(mockRequest.getParameter("shipment")).thenReturn(null);
-    when(mockRequest.getParameter("quotation")).thenReturn(null);
-    when(mockRequest.getParameter("orderProforma")).thenReturn(null);
-    when(mockRequest.getParameter("shipmentValued")).thenReturn(null);
-    when(mockRequest.getParameter("quotationProforma")).thenReturn(null);
-    when(mockRequest.getParameter("organization")).thenReturn("");
-    when(mockRequest.getParameter("purchase")).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn("");
+    when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn(null);
 
     OBException ex = assertThrows(OBException.class,
         () -> printDocument.doGet("", mockRequest, mockResponse));
-    assertTrue(ex.getMessage().contains("organization"));
+    assertTrue(ex.getMessage().contains(PARAM_ORGANIZATION));
   }
 
   /**
@@ -113,15 +125,15 @@ class PrintDocumentTest {
    */
   @Test
   void testDoGetThrowsWhenNoDocumentsFound() throws Exception {
-    when(mockRequest.getParameter("order")).thenReturn("ORD-001");
-    when(mockRequest.getParameter("invoice")).thenReturn(null);
-    when(mockRequest.getParameter("shipment")).thenReturn(null);
-    when(mockRequest.getParameter("quotation")).thenReturn(null);
-    when(mockRequest.getParameter("orderProforma")).thenReturn(null);
-    when(mockRequest.getParameter("shipmentValued")).thenReturn(null);
-    when(mockRequest.getParameter("quotationProforma")).thenReturn(null);
-    when(mockRequest.getParameter("organization")).thenReturn("ORG-1");
-    when(mockRequest.getParameter("purchase")).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER)).thenReturn(DOC_ORD_001);
+    when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(ORG_1);
+    when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn(null);
 
     doNothing().when(printDocument).fillDocuments(nullable(String.class), nullable(String.class),
         nullable(String.class), nullable(String.class), nullable(String.class),
@@ -129,7 +141,7 @@ class PrintDocumentTest {
 
     OBException ex = assertThrows(OBException.class,
         () -> printDocument.doGet("", mockRequest, mockResponse));
-    assertTrue(ex.getMessage().contains("ORD-001"));
+    assertTrue(ex.getMessage().contains(DOC_ORD_001));
   }
 
   /**
@@ -139,15 +151,15 @@ class PrintDocumentTest {
    */
   @Test
   void testDoGetErrorMessageIncludesAllDocumentNumbers() throws Exception {
-    when(mockRequest.getParameter("order")).thenReturn("ORD-001");
-    when(mockRequest.getParameter("invoice")).thenReturn("INV-001");
-    when(mockRequest.getParameter("shipment")).thenReturn("SHP-001");
-    when(mockRequest.getParameter("quotation")).thenReturn("QUO-001");
-    when(mockRequest.getParameter("orderProforma")).thenReturn(null);
-    when(mockRequest.getParameter("shipmentValued")).thenReturn(null);
-    when(mockRequest.getParameter("quotationProforma")).thenReturn(null);
-    when(mockRequest.getParameter("organization")).thenReturn("ORG-1");
-    when(mockRequest.getParameter("purchase")).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER)).thenReturn(DOC_ORD_001);
+    when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn("INV-001");
+    when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn("SHP-001");
+    when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn("QUO-001");
+    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(ORG_1);
+    when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn(null);
 
     doNothing().when(printDocument).fillDocuments(nullable(String.class), nullable(String.class),
         nullable(String.class), nullable(String.class), nullable(String.class),
@@ -156,7 +168,7 @@ class PrintDocumentTest {
     OBException ex = assertThrows(OBException.class,
         () -> printDocument.doGet("", mockRequest, mockResponse));
     String msg = ex.getMessage();
-    assertTrue(msg.contains("ORD-001"));
+    assertTrue(msg.contains(DOC_ORD_001));
     assertTrue(msg.contains("INV-001"));
     assertTrue(msg.contains("SHP-001"));
     assertTrue(msg.contains("QUO-001"));
@@ -169,15 +181,15 @@ class PrintDocumentTest {
    */
   @Test
   void testDoGetSetsDocumentTypeForOrderProforma() throws Exception {
-    when(mockRequest.getParameter("order")).thenReturn(null);
-    when(mockRequest.getParameter("invoice")).thenReturn(null);
-    when(mockRequest.getParameter("shipment")).thenReturn(null);
-    when(mockRequest.getParameter("quotation")).thenReturn(null);
-    when(mockRequest.getParameter("orderProforma")).thenReturn("PRO-001");
-    when(mockRequest.getParameter("shipmentValued")).thenReturn(null);
-    when(mockRequest.getParameter("quotationProforma")).thenReturn(null);
-    when(mockRequest.getParameter("organization")).thenReturn("ORG-1");
-    when(mockRequest.getParameter("purchase")).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn("PRO-001");
+    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(ORG_1);
+    when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn(null);
 
     doNothing().when(printDocument).fillDocuments(nullable(String.class), nullable(String.class),
         nullable(String.class), nullable(String.class), nullable(String.class),
@@ -185,7 +197,7 @@ class PrintDocumentTest {
 
     List<BaseOBObject> orderList = new ArrayList<>();
     orderList.add(mock(BaseOBObject.class));
-    doReturn(orderList).when(printDocument).getOrder("PRO-001", "ORG-1", null);
+    doReturn(orderList).when(printDocument).getOrder("PRO-001", ORG_1, null);
     doNothing().when(printDocument).generateDocuments(mockRequest, mockResponse,
         printDocument.customDocuments, true);
     doNothing().when(printDocument).printReports(mockResponse, false);
@@ -203,15 +215,15 @@ class PrintDocumentTest {
    */
   @Test
   void testDoGetSetsDocumentTypeForShipmentValued() throws Exception {
-    when(mockRequest.getParameter("order")).thenReturn(null);
-    when(mockRequest.getParameter("invoice")).thenReturn(null);
-    when(mockRequest.getParameter("shipment")).thenReturn(null);
-    when(mockRequest.getParameter("quotation")).thenReturn(null);
-    when(mockRequest.getParameter("orderProforma")).thenReturn(null);
-    when(mockRequest.getParameter("shipmentValued")).thenReturn("SHV-001");
-    when(mockRequest.getParameter("quotationProforma")).thenReturn(null);
-    when(mockRequest.getParameter("organization")).thenReturn("ORG-1");
-    when(mockRequest.getParameter("purchase")).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn("SHV-001");
+    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(ORG_1);
+    when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn(null);
 
     doNothing().when(printDocument).fillDocuments(nullable(String.class), nullable(String.class),
         nullable(String.class), nullable(String.class), nullable(String.class),
@@ -219,7 +231,7 @@ class PrintDocumentTest {
 
     List<BaseOBObject> shipmentList = new ArrayList<>();
     shipmentList.add(mock(BaseOBObject.class));
-    doReturn(shipmentList).when(printDocument).getShipment("SHV-001", "ORG-1", null);
+    doReturn(shipmentList).when(printDocument).getShipment("SHV-001", ORG_1, null);
     doNothing().when(printDocument).generateDocuments(mockRequest, mockResponse,
         printDocument.customDocuments, true);
     doNothing().when(printDocument).printReports(mockResponse, false);
@@ -237,15 +249,15 @@ class PrintDocumentTest {
    */
   @Test
   void testDoGetSetsDocumentTypeForQuotationProforma() throws Exception {
-    when(mockRequest.getParameter("order")).thenReturn(null);
-    when(mockRequest.getParameter("invoice")).thenReturn(null);
-    when(mockRequest.getParameter("shipment")).thenReturn(null);
-    when(mockRequest.getParameter("quotation")).thenReturn(null);
-    when(mockRequest.getParameter("orderProforma")).thenReturn(null);
-    when(mockRequest.getParameter("shipmentValued")).thenReturn(null);
-    when(mockRequest.getParameter("quotationProforma")).thenReturn("QPR-001");
-    when(mockRequest.getParameter("organization")).thenReturn("ORG-1");
-    when(mockRequest.getParameter("purchase")).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn("QPR-001");
+    when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(ORG_1);
+    when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn(null);
 
     doNothing().when(printDocument).fillDocuments(nullable(String.class), nullable(String.class),
         nullable(String.class), nullable(String.class), nullable(String.class),
@@ -253,7 +265,7 @@ class PrintDocumentTest {
 
     List<BaseOBObject> quotationList = new ArrayList<>();
     quotationList.add(mock(BaseOBObject.class));
-    doReturn(quotationList).when(printDocument).getQuotation("QPR-001", "ORG-1", null);
+    doReturn(quotationList).when(printDocument).getQuotation("QPR-001", ORG_1, null);
     doNothing().when(printDocument).generateDocuments(mockRequest, mockResponse,
         printDocument.customDocuments, true);
     doNothing().when(printDocument).printReports(mockResponse, false);

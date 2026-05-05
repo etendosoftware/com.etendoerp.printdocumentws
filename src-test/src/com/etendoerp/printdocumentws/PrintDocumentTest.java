@@ -18,38 +18,52 @@ package com.etendoerp.printdocumentws;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.openbravo.base.exception.OBException;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.openbravo.base.ConfigParameters;
 import org.openbravo.base.structure.BaseOBObject;
 import org.openbravo.erpCommon.utility.reporting.DocumentType;
+import org.openbravo.erpCommon.utility.reporting.ReportManager;
 import org.openbravo.model.common.enterprise.DocumentTemplate;
+
+import org.openbravo.base.exception.OBException;
+
 
 /**
  * Tests for {@link PrintDocument}.
  */
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class PrintDocumentTest {
 
   private static final String PARAM_ORDER = "order";
@@ -69,6 +83,12 @@ class PrintDocumentTest {
 
   @Mock
   private HttpServletResponse mockResponse;
+
+  @Mock
+  private HttpSession mockSession;
+
+  @Mock
+  private ServletContext mockServletContext;
 
   private PrintDocument printDocument;
 
@@ -283,10 +303,12 @@ class PrintDocumentTest {
   void testGetReportManagerDelegatesToSuperWhenNotCustom() {
     org.openbravo.model.common.enterprise.DocumentType mockDocType =
         mock(org.openbravo.model.common.enterprise.DocumentType.class);
+    ReportManager existingManager = mock(ReportManager.class);
+    setParentField(printDocument, "reportManager", existingManager);
 
-    doReturn(null).when(printDocument).getReportManager(mockRequest, mockDocType, false);
+    ReportManager result = printDocument.getReportManager(mockRequest, mockDocType, false);
 
-    assertNull(printDocument.getReportManager(mockRequest, mockDocType, false));
+    assertSame(existingManager, result);
   }
 
   /**
@@ -297,12 +319,15 @@ class PrintDocumentTest {
     org.openbravo.model.common.enterprise.DocumentType mockDocType =
         mock(org.openbravo.model.common.enterprise.DocumentType.class);
     DocumentTemplate mockTemplate = mock(DocumentTemplate.class);
+    ReportManager existingManager = mock(ReportManager.class);
+    setParentField(printDocument, "reportManager", existingManager);
     when(mockTemplate.isActive()).thenReturn(true);
     when(mockTemplate.getTemplateLocation()).thenReturn("");
     when(mockDocType.getDocumentTemplateList()).thenReturn(Collections.singletonList(mockTemplate));
 
-    assertThrows(NullPointerException.class,
-        () -> printDocument.getReportManager(mockRequest, mockDocType, true));
+    ReportManager result = printDocument.getReportManager(mockRequest, mockDocType, true);
+
+    assertSame(existingManager, result);
   }
 
   /**
@@ -313,11 +338,14 @@ class PrintDocumentTest {
     org.openbravo.model.common.enterprise.DocumentType mockDocType =
         mock(org.openbravo.model.common.enterprise.DocumentType.class);
     DocumentTemplate mockTemplate = mock(DocumentTemplate.class);
+    ReportManager existingManager = mock(ReportManager.class);
+    setParentField(printDocument, "reportManager", existingManager);
     when(mockTemplate.isActive()).thenReturn(false);
     when(mockDocType.getDocumentTemplateList()).thenReturn(Collections.singletonList(mockTemplate));
 
-    assertThrows(NullPointerException.class,
-        () -> printDocument.getReportManager(mockRequest, mockDocType, true));
+    ReportManager result = printDocument.getReportManager(mockRequest, mockDocType, true);
+
+    assertSame(existingManager, result);
   }
 
   /**
@@ -329,9 +357,141 @@ class PrintDocumentTest {
     assertTrue(printDocument.customDocuments.isEmpty());
   }
 
+  @Test
+  void testDoGetGeneratesBaseAndCustomDocumentsAndPrintsAsMultiReport() throws Exception {
+    BaseOBObject baseDocument = mock(BaseOBObject.class);
+    BaseOBObject customOrder = mock(BaseOBObject.class);
+    BaseOBObject customShipment = mock(BaseOBObject.class);
+
+    when(mockRequest.getParameter(PARAM_ORDER)).thenReturn(DOC_ORD_001);
+    when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn("PRO-001");
+    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn("SHV-001");
+    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(ORG_1);
+    when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn("true");
+
+    printDocument.documents.add(baseDocument);
+    doNothing().when(printDocument).fillDocuments(DOC_ORD_001, null, null, null, ORG_1, "true");
+    doReturn(Collections.singletonList(customOrder)).when(printDocument).getOrder("PRO-001", ORG_1,
+        "true");
+    doReturn(Collections.singletonList(customShipment)).when(printDocument).getShipment("SHV-001",
+        ORG_1, "true");
+    doNothing().when(printDocument).generateDocuments(any(HttpServletRequest.class),
+        any(HttpServletResponse.class), any(), any(Boolean.class));
+    doNothing().when(printDocument).printReports(mockResponse, true);
+    addSavedReport(printDocument);
+    addSavedReport(printDocument);
+
+    printDocument.doGet("", mockRequest, mockResponse);
+
+    verify(printDocument).generateDocuments(mockRequest, mockResponse, printDocument.documents, false);
+    verify(printDocument).generateDocuments(mockRequest, mockResponse, printDocument.customDocuments,
+        true);
+    verify(printDocument).printReports(mockResponse, true);
+    assertEquals(2, printDocument.customDocuments.size());
+    assertEquals(DocumentType.SHIPMENT, getDocumentType(printDocument));
+  }
+
+  @Test
+  void testDoGetErrorMessageIncludesCustomDocumentNumbers() throws Exception {
+    when(mockRequest.getParameter(PARAM_ORDER)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn("PRO-001");
+    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn("SHV-001");
+    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn("QPR-001");
+    when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(ORG_1);
+    when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn(null);
+
+    doNothing().when(printDocument).fillDocuments(nullable(String.class), nullable(String.class),
+        nullable(String.class), nullable(String.class), nullable(String.class),
+        nullable(String.class));
+    doReturn(Collections.emptyList()).when(printDocument).getOrder("PRO-001", ORG_1, null);
+    doReturn(Collections.emptyList()).when(printDocument).getShipment("SHV-001", ORG_1, null);
+    doReturn(Collections.emptyList()).when(printDocument).getQuotation("QPR-001", ORG_1, null);
+
+    OBException ex = assertThrows(OBException.class,
+        () -> printDocument.doGet("", mockRequest, mockResponse));
+
+    assertTrue(ex.getMessage().contains("Proforma Invoice (Sales Order): PRO-001"));
+    assertTrue(ex.getMessage().contains("Valued Delivery Note (Customer): SHV-001"));
+    assertTrue(ex.getMessage().contains("Proforma Invoice (budget): QPR-001"));
+  }
+
+  @Test
+  void testDoGetPrintsSingleReportWhenOnlyBaseDocumentsExist() throws Exception {
+    BaseOBObject baseDocument = mock(BaseOBObject.class);
+
+    when(mockRequest.getParameter(PARAM_ORDER)).thenReturn(DOC_ORD_001);
+    when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn(null);
+    when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(ORG_1);
+    when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn(null);
+
+    printDocument.documents.add(baseDocument);
+    doNothing().when(printDocument).fillDocuments(DOC_ORD_001, null, null, null, ORG_1, null);
+    doNothing().when(printDocument).generateDocuments(mockRequest, mockResponse, printDocument.documents,
+        false);
+    doNothing().when(printDocument).printReports(mockResponse, false);
+    addSavedReport(printDocument);
+
+    printDocument.doGet("", mockRequest, mockResponse);
+
+    verify(printDocument).generateDocuments(mockRequest, mockResponse, printDocument.documents, false);
+    verify(printDocument, times(0)).generateDocuments(eq(mockRequest), eq(mockResponse),
+        eq(printDocument.customDocuments), eq(true));
+    verify(printDocument).printReports(mockResponse, false);
+  }
+
+  @Test
+  void testGetReportManagerThrowsWhenCustomTemplateNeedsServletConfiguration() {
+    org.openbravo.model.common.enterprise.DocumentType mockDocType =
+        mock(org.openbravo.model.common.enterprise.DocumentType.class);
+    DocumentTemplate mockTemplate = mock(DocumentTemplate.class);
+
+    when(mockTemplate.isActive()).thenReturn(true);
+    when(mockTemplate.getTemplateLocation()).thenReturn("@basedesign@/custom.jrxml");
+    when(mockDocType.getDocumentTemplateList()).thenReturn(Collections.singletonList(mockTemplate));
+    when(mockRequest.getSession()).thenReturn(mockSession);
+    when(mockSession.getServletContext()).thenReturn(mockServletContext);
+
+    assertThrows(Exception.class, () -> printDocument.getReportManager(mockRequest, mockDocType, true));
+  }
+
   private static DocumentType getDocumentType(Object target) throws Exception {
     Field field = com.smf.ws.printdocument.PrintDocument.class.getDeclaredField("documentType");
     field.setAccessible(true);
     return (DocumentType) field.get(target);
+  }
+
+  private static void setParentField(Object target, String fieldName, Object value) {
+    try {
+      Field field = com.smf.ws.printdocument.PrintDocument.class.getDeclaredField(fieldName);
+      field.setAccessible(true);
+      field.set(target, value);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static void addSavedReport(PrintDocument target) {
+    try {
+      Field field = com.smf.ws.printdocument.PrintDocument.class.getDeclaredField("savedReports");
+      field.setAccessible(true);
+      @SuppressWarnings("unchecked")
+      java.util.Collection<org.openbravo.erpCommon.utility.reporting.Report> savedReports =
+          (java.util.Collection<org.openbravo.erpCommon.utility.reporting.Report>) field.get(target);
+      savedReports.add(mock(org.openbravo.erpCommon.utility.reporting.Report.class));
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 }

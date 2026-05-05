@@ -302,6 +302,7 @@ class ReportManagerCustomTest {
         () -> reportManagerCustom.processReport(mockReport, mockVars));
   }
 
+
   /**
    * Creates mock {@link Report} and {@link VariablesSecureApp} objects and invokes
    * the private {@code populateDesignParameters} method with the given arguments.

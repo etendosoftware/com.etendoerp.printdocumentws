@@ -77,6 +77,10 @@ class PrintDocumentTest {
   private static final String PARAM_PURCHASE = "purchase";
   private static final String DOC_ORD_001 = "ORD-001";
   private static final String ORG_1 = "ORG-1";
+  private static final String ORDER_PROFORMA_001 = "PRO-001";
+  private static final String SHIPMENT_VALUED_001 = "SHV-001";
+  private static final String QUOTATION_PROFORMA_001 = "QPR-001";
+  private static final String REPORT_MANAGER_FIELD = "reportManager";
 
   @Mock
   private HttpServletRequest mockRequest;
@@ -205,7 +209,7 @@ class PrintDocumentTest {
     when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
-    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn("PRO-001");
+    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn(ORDER_PROFORMA_001);
     when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(ORG_1);
@@ -217,7 +221,7 @@ class PrintDocumentTest {
 
     List<BaseOBObject> orderList = new ArrayList<>();
     orderList.add(mock(BaseOBObject.class));
-    doReturn(orderList).when(printDocument).getOrder("PRO-001", ORG_1, null);
+    doReturn(orderList).when(printDocument).getOrder(ORDER_PROFORMA_001, ORG_1, null);
     doNothing().when(printDocument).generateDocuments(mockRequest, mockResponse,
         printDocument.customDocuments, true);
     doNothing().when(printDocument).printReports(mockResponse, false);
@@ -240,7 +244,7 @@ class PrintDocumentTest {
     when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn(null);
-    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn("SHV-001");
+    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn(SHIPMENT_VALUED_001);
     when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(ORG_1);
     when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn(null);
@@ -251,7 +255,7 @@ class PrintDocumentTest {
 
     List<BaseOBObject> shipmentList = new ArrayList<>();
     shipmentList.add(mock(BaseOBObject.class));
-    doReturn(shipmentList).when(printDocument).getShipment("SHV-001", ORG_1, null);
+    doReturn(shipmentList).when(printDocument).getShipment(SHIPMENT_VALUED_001, ORG_1, null);
     doNothing().when(printDocument).generateDocuments(mockRequest, mockResponse,
         printDocument.customDocuments, true);
     doNothing().when(printDocument).printReports(mockResponse, false);
@@ -275,7 +279,7 @@ class PrintDocumentTest {
     when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn(null);
-    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn("QPR-001");
+    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn(QUOTATION_PROFORMA_001);
     when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(ORG_1);
     when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn(null);
 
@@ -285,7 +289,7 @@ class PrintDocumentTest {
 
     List<BaseOBObject> quotationList = new ArrayList<>();
     quotationList.add(mock(BaseOBObject.class));
-    doReturn(quotationList).when(printDocument).getQuotation("QPR-001", ORG_1, null);
+    doReturn(quotationList).when(printDocument).getQuotation(QUOTATION_PROFORMA_001, ORG_1, null);
     doNothing().when(printDocument).generateDocuments(mockRequest, mockResponse,
         printDocument.customDocuments, true);
     doNothing().when(printDocument).printReports(mockResponse, false);
@@ -304,7 +308,7 @@ class PrintDocumentTest {
     org.openbravo.model.common.enterprise.DocumentType mockDocType =
         mock(org.openbravo.model.common.enterprise.DocumentType.class);
     ReportManager existingManager = mock(ReportManager.class);
-    setParentField(printDocument, "reportManager", existingManager);
+    setParentField(printDocument, REPORT_MANAGER_FIELD, existingManager);
 
     ReportManager result = printDocument.getReportManager(mockRequest, mockDocType, false);
 
@@ -320,7 +324,7 @@ class PrintDocumentTest {
         mock(org.openbravo.model.common.enterprise.DocumentType.class);
     DocumentTemplate mockTemplate = mock(DocumentTemplate.class);
     ReportManager existingManager = mock(ReportManager.class);
-    setParentField(printDocument, "reportManager", existingManager);
+    setParentField(printDocument, REPORT_MANAGER_FIELD, existingManager);
     when(mockTemplate.isActive()).thenReturn(true);
     when(mockTemplate.getTemplateLocation()).thenReturn("");
     when(mockDocType.getDocumentTemplateList()).thenReturn(Collections.singletonList(mockTemplate));
@@ -339,7 +343,7 @@ class PrintDocumentTest {
         mock(org.openbravo.model.common.enterprise.DocumentType.class);
     DocumentTemplate mockTemplate = mock(DocumentTemplate.class);
     ReportManager existingManager = mock(ReportManager.class);
-    setParentField(printDocument, "reportManager", existingManager);
+    setParentField(printDocument, REPORT_MANAGER_FIELD, existingManager);
     when(mockTemplate.isActive()).thenReturn(false);
     when(mockDocType.getDocumentTemplateList()).thenReturn(Collections.singletonList(mockTemplate));
 
@@ -367,17 +371,17 @@ class PrintDocumentTest {
     when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
-    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn("PRO-001");
-    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn("SHV-001");
+    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn(ORDER_PROFORMA_001);
+    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn(SHIPMENT_VALUED_001);
     when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(ORG_1);
     when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn("true");
 
     printDocument.documents.add(baseDocument);
     doNothing().when(printDocument).fillDocuments(DOC_ORD_001, null, null, null, ORG_1, "true");
-    doReturn(Collections.singletonList(customOrder)).when(printDocument).getOrder("PRO-001", ORG_1,
+    doReturn(Collections.singletonList(customOrder)).when(printDocument).getOrder(ORDER_PROFORMA_001, ORG_1,
         "true");
-    doReturn(Collections.singletonList(customShipment)).when(printDocument).getShipment("SHV-001",
+    doReturn(Collections.singletonList(customShipment)).when(printDocument).getShipment(SHIPMENT_VALUED_001,
         ORG_1, "true");
     doNothing().when(printDocument).generateDocuments(any(HttpServletRequest.class),
         any(HttpServletResponse.class), any(), any(Boolean.class));
@@ -401,25 +405,25 @@ class PrintDocumentTest {
     when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_QUOTATION)).thenReturn(null);
-    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn("PRO-001");
-    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn("SHV-001");
-    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn("QPR-001");
+    when(mockRequest.getParameter(PARAM_ORDER_PROFORMA)).thenReturn(ORDER_PROFORMA_001);
+    when(mockRequest.getParameter(PARAM_SHIPMENT_VALUED)).thenReturn(SHIPMENT_VALUED_001);
+    when(mockRequest.getParameter(PARAM_QUOTATION_PROFORMA)).thenReturn(QUOTATION_PROFORMA_001);
     when(mockRequest.getParameter(PARAM_ORGANIZATION)).thenReturn(ORG_1);
     when(mockRequest.getParameter(PARAM_PURCHASE)).thenReturn(null);
 
     doNothing().when(printDocument).fillDocuments(nullable(String.class), nullable(String.class),
         nullable(String.class), nullable(String.class), nullable(String.class),
         nullable(String.class));
-    doReturn(Collections.emptyList()).when(printDocument).getOrder("PRO-001", ORG_1, null);
-    doReturn(Collections.emptyList()).when(printDocument).getShipment("SHV-001", ORG_1, null);
-    doReturn(Collections.emptyList()).when(printDocument).getQuotation("QPR-001", ORG_1, null);
+    doReturn(Collections.emptyList()).when(printDocument).getOrder(ORDER_PROFORMA_001, ORG_1, null);
+    doReturn(Collections.emptyList()).when(printDocument).getShipment(SHIPMENT_VALUED_001, ORG_1, null);
+    doReturn(Collections.emptyList()).when(printDocument).getQuotation(QUOTATION_PROFORMA_001, ORG_1, null);
 
     OBException ex = assertThrows(OBException.class,
         () -> printDocument.doGet("", mockRequest, mockResponse));
 
-    assertTrue(ex.getMessage().contains("Proforma Invoice (Sales Order): PRO-001"));
-    assertTrue(ex.getMessage().contains("Valued Delivery Note (Customer): SHV-001"));
-    assertTrue(ex.getMessage().contains("Proforma Invoice (budget): QPR-001"));
+    assertTrue(ex.getMessage().contains("Proforma Invoice (Sales Order): " + ORDER_PROFORMA_001));
+    assertTrue(ex.getMessage().contains("Valued Delivery Note (Customer): " + SHIPMENT_VALUED_001));
+    assertTrue(ex.getMessage().contains("Proforma Invoice (budget): " + QUOTATION_PROFORMA_001));
   }
 
   @Test
@@ -477,8 +481,8 @@ class PrintDocumentTest {
       Field field = com.smf.ws.printdocument.PrintDocument.class.getDeclaredField(fieldName);
       field.setAccessible(true);
       field.set(target, value);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    } catch (ReflectiveOperationException e) {
+      throw new TestSetupException("Unable to set parent field: " + fieldName, e);
     }
   }
 
@@ -490,8 +494,14 @@ class PrintDocumentTest {
       java.util.Collection<org.openbravo.erpCommon.utility.reporting.Report> savedReports =
           (java.util.Collection<org.openbravo.erpCommon.utility.reporting.Report>) field.get(target);
       savedReports.add(mock(org.openbravo.erpCommon.utility.reporting.Report.class));
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    } catch (ReflectiveOperationException e) {
+      throw new TestSetupException("Unable to add saved report", e);
+    }
+  }
+
+  private static class TestSetupException extends RuntimeException {
+    TestSetupException(String message, Throwable cause) {
+      super(message, cause);
     }
   }
 }

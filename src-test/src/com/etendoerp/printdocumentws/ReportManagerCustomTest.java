@@ -116,7 +116,7 @@ class ReportManagerCustomTest {
    */
   @Test
   void testConstructorStoresAllFields() throws Exception {
-    assertEquals(mockConnectionProvider, getPrivateFieldObject("_connectionProvider"));
+    assertEquals(mockConnectionProvider, getPrivateFieldObject());
     assertEquals(REPLACE_WITH_FULL, getPrivateField("_strBaseWeb"));
     assertEquals(FTP_DIRECTORY, getPrivateField("_strAttachmentPath"));
     assertEquals(PREFIX, getPrivateField("_prefix"));
@@ -143,7 +143,7 @@ class ReportManagerCustomTest {
    */
   @Test
   void testPopulateDesignParametersIncludesDocumentId() throws Exception {
-    HashMap<String, Object> params = invokePopulateWithDefaults(DOC_123, LANG_EN_US, null);
+    HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertEquals(DOC_123, params.get("DOCUMENT_ID"));
   }
 
@@ -154,7 +154,7 @@ class ReportManagerCustomTest {
    */
   @Test
   void testPopulateDesignParametersIncludesBaseAttach() throws Exception {
-    HashMap<String, Object> params = invokePopulateWithDefaults(DOC_123, LANG_EN_US, null);
+    HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertEquals(FTP_DIRECTORY, params.get("BASE_ATTACH"));
   }
 
@@ -165,7 +165,7 @@ class ReportManagerCustomTest {
    */
   @Test
   void testPopulateDesignParametersIncludesBaseWeb() throws Exception {
-    HashMap<String, Object> params = invokePopulateWithDefaults(DOC_123, LANG_EN_US, null);
+    HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertEquals(REPLACE_WITH_FULL, params.get("BASE_WEB"));
   }
 
@@ -176,7 +176,7 @@ class ReportManagerCustomTest {
    */
   @Test
   void testPopulateDesignParametersIncludesBaseDesign() throws Exception {
-    HashMap<String, Object> params = invokePopulateWithDefaults(DOC_123, LANG_EN_US, null);
+    HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertEquals(PREFIX + "/" + DESIGN_VALUE + "/" + DEFAULT_DESIGN_VALUE, params.get("BASE_DESIGN"));
   }
 
@@ -187,7 +187,7 @@ class ReportManagerCustomTest {
    */
   @Test
   void testPopulateDesignParametersSetsIgnorePaginationFalse() throws Exception {
-    HashMap<String, Object> params = invokePopulateWithDefaults(DOC_123, LANG_EN_US, null);
+    HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertFalse((Boolean) params.get("IS_IGNORE_PAGINATION"));
   }
 
@@ -198,7 +198,7 @@ class ReportManagerCustomTest {
    */
   @Test
   void testPopulateDesignParametersSetsLanguage() throws Exception {
-    HashMap<String, Object> params = invokePopulateWithDefaults(DOC_123, LANG_EN_US, null);
+    HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertEquals(LANG_EN_US, params.get("LANGUAGE"));
   }
 
@@ -209,7 +209,7 @@ class ReportManagerCustomTest {
    */
   @Test
   void testPopulateDesignParametersSetsLocale() throws Exception {
-    HashMap<String, Object> params = invokePopulateWithDefaults(DOC_123, "es_ES", null);
+    HashMap<String, Object> params = invokePopulateWithDefaults("es_ES", null);
     Locale locale = (Locale) params.get("LOCALE");
     assertEquals("es", locale.getLanguage());
     assertEquals("ES", locale.getCountry());
@@ -222,7 +222,7 @@ class ReportManagerCustomTest {
    */
   @Test
   void testPopulateDesignParametersSetsNumberFormat() throws Exception {
-    HashMap<String, Object> params = invokePopulateWithDefaults(DOC_123, LANG_EN_US, null);
+    HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertNotNull(params.get("NUMBERFORMAT"));
   }
 
@@ -238,7 +238,7 @@ class ReportManagerCustomTest {
     when(mockTemplateInfo.getShowCompanyData()).thenReturn("N");
     when(mockTemplateInfo.getHeaderMargin()).thenReturn("10");
 
-    HashMap<String, Object> params = invokePopulateWithDefaults(DOC_123, LANG_EN_US,
+    HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US,
         mockTemplateInfo);
 
     assertEquals("Y", params.get("SHOW_LOGO"));
@@ -253,7 +253,7 @@ class ReportManagerCustomTest {
    */
   @Test
   void testPopulateDesignParametersExcludesTemplateInfoWhenNull() throws Exception {
-    HashMap<String, Object> params = invokePopulateWithDefaults(DOC_123, LANG_EN_US, null);
+    HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertFalse(params.containsKey("SHOW_LOGO"));
     assertFalse(params.containsKey("SHOW_COMPANYDATA"));
     assertFalse(params.containsKey("HEADER_MARGIN"));
@@ -266,7 +266,7 @@ class ReportManagerCustomTest {
    */
   @Test
   void testPopulateDesignParametersCountWithoutTemplateInfo() throws Exception {
-    HashMap<String, Object> params = invokePopulateWithDefaults(DOC_123, LANG_EN_US, null);
+    HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertEquals(10, params.size());
   }
 
@@ -282,7 +282,7 @@ class ReportManagerCustomTest {
     when(mockTemplateInfo.getShowCompanyData()).thenReturn("N");
     when(mockTemplateInfo.getHeaderMargin()).thenReturn("10");
 
-    HashMap<String, Object> params = invokePopulateWithDefaults(DOC_123, LANG_EN_US,
+    HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US,
         mockTemplateInfo);
 
     assertEquals(13, params.size());
@@ -307,17 +307,19 @@ class ReportManagerCustomTest {
    * Creates mock {@link Report} and {@link VariablesSecureApp} objects and invokes
    * the private {@code populateDesignParameters} method with the given arguments.
    *
-   * @param documentId the document identifier to set on the mock report
-   * @param language the language code to set on the mock variables
-   * @param templateInfo the template info to set on the mock report, may be {@code null}
+   * @param language
+   *     the language code to set on the mock variables
+   * @param templateInfo
+   *     the template info to set on the mock report, may be {@code null}
    * @return the populated design parameters map
-   * @throws Exception if reflective invocation fails
+   * @throws Exception
+   *     if reflective invocation fails
    */
-  private HashMap<String, Object> invokePopulateWithDefaults(String documentId, String language,
+  private HashMap<String, Object> invokePopulateWithDefaults(String language,
       TemplateInfo templateInfo) throws Exception {
     Report mockReport = mock(Report.class);
     VariablesSecureApp mockVars = createMockVariables(language);
-    when(mockReport.getDocumentId()).thenReturn(documentId);
+    when(mockReport.getDocumentId()).thenReturn(ReportManagerCustomTest.DOC_123);
     when(mockReport.getTemplateInfo()).thenReturn(templateInfo);
     return invokePopulateDesignParameters(mockVars, mockReport);
   }
@@ -387,12 +389,12 @@ class ReportManagerCustomTest {
   /**
    * Retrieves a private field value as {@link Object} from the default test instance.
    *
-   * @param fieldName the name of the private field
    * @return the field value
-   * @throws Exception if reflective access fails
+   * @throws Exception
+   *     if reflective access fails
    */
-  private Object getPrivateFieldObject(String fieldName) throws Exception {
-    Field field = ReportManagerCustom.class.getDeclaredField(fieldName);
+  private Object getPrivateFieldObject() throws Exception {
+    Field field = ReportManagerCustom.class.getDeclaredField("_connectionProvider");
     field.setAccessible(true);
     return field.get(reportManagerCustom);
   }

@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -34,14 +33,13 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +48,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.openbravo.base.ConfigParameters;
 import org.openbravo.base.structure.BaseOBObject;
 import org.openbravo.erpCommon.utility.reporting.DocumentType;
 import org.openbravo.erpCommon.utility.reporting.ReportManager;
@@ -308,7 +305,7 @@ class PrintDocumentTest {
     org.openbravo.model.common.enterprise.DocumentType mockDocType =
         mock(org.openbravo.model.common.enterprise.DocumentType.class);
     ReportManager existingManager = mock(ReportManager.class);
-    setParentField(printDocument, REPORT_MANAGER_FIELD, existingManager);
+    setParentField(printDocument, existingManager);
 
     ReportManager result = printDocument.getReportManager(mockRequest, mockDocType, false);
 
@@ -324,7 +321,7 @@ class PrintDocumentTest {
         mock(org.openbravo.model.common.enterprise.DocumentType.class);
     DocumentTemplate mockTemplate = mock(DocumentTemplate.class);
     ReportManager existingManager = mock(ReportManager.class);
-    setParentField(printDocument, REPORT_MANAGER_FIELD, existingManager);
+    setParentField(printDocument, existingManager);
     when(mockTemplate.isActive()).thenReturn(true);
     when(mockTemplate.getTemplateLocation()).thenReturn("");
     when(mockDocType.getDocumentTemplateList()).thenReturn(Collections.singletonList(mockTemplate));
@@ -343,7 +340,7 @@ class PrintDocumentTest {
         mock(org.openbravo.model.common.enterprise.DocumentType.class);
     DocumentTemplate mockTemplate = mock(DocumentTemplate.class);
     ReportManager existingManager = mock(ReportManager.class);
-    setParentField(printDocument, REPORT_MANAGER_FIELD, existingManager);
+    setParentField(printDocument, existingManager);
     when(mockTemplate.isActive()).thenReturn(false);
     when(mockDocType.getDocumentTemplateList()).thenReturn(Collections.singletonList(mockTemplate));
 
@@ -400,7 +397,7 @@ class PrintDocumentTest {
   }
 
   @Test
-  void testDoGetErrorMessageIncludesCustomDocumentNumbers() throws Exception {
+  void testDoGetErrorMessageIncludesCustomDocumentNumbers() {
     when(mockRequest.getParameter(PARAM_ORDER)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_INVOICE)).thenReturn(null);
     when(mockRequest.getParameter(PARAM_SHIPMENT)).thenReturn(null);
@@ -450,8 +447,8 @@ class PrintDocumentTest {
     printDocument.doGet("", mockRequest, mockResponse);
 
     verify(printDocument).generateDocuments(mockRequest, mockResponse, printDocument.documents, false);
-    verify(printDocument, times(0)).generateDocuments(eq(mockRequest), eq(mockResponse),
-        eq(printDocument.customDocuments), eq(true));
+    verify(printDocument, times(0)).generateDocuments(mockRequest, mockResponse,
+        printDocument.customDocuments, true);
     verify(printDocument).printReports(mockResponse, false);
   }
 
@@ -476,13 +473,14 @@ class PrintDocumentTest {
     return (DocumentType) field.get(target);
   }
 
-  private static void setParentField(Object target, String fieldName, Object value) {
+  private static void setParentField(Object target, Object value) {
     try {
-      Field field = com.smf.ws.printdocument.PrintDocument.class.getDeclaredField(fieldName);
+      Field field = com.smf.ws.printdocument.PrintDocument.class.getDeclaredField(
+          PrintDocumentTest.REPORT_MANAGER_FIELD);
       field.setAccessible(true);
       field.set(target, value);
     } catch (ReflectiveOperationException e) {
-      throw new TestSetupException("Unable to set parent field: " + fieldName, e);
+      throw new TestSetupException("Unable to set parent field: " + PrintDocumentTest.REPORT_MANAGER_FIELD, e);
     }
   }
 

@@ -47,6 +47,15 @@ import org.openbravo.erpCommon.utility.reporting.TemplateInfo;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ReportManagerCustomTest {
 
+  /** Dedicated unchecked exception for reflective helper failures in tests. */
+  private static final class TestReflectionException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
+    private TestReflectionException(String message, ReflectiveOperationException cause) {
+      super(message, cause);
+    }
+  }
+
   private static final String FTP_DIRECTORY = "/tmp/ftp";
   private static final String REPLACE_WITH_FULL = "http://localhost/web";
   private static final String BASE_DESIGN_PATH = "design/";
@@ -139,10 +148,9 @@ class ReportManagerCustomTest {
   /**
    * Verifies that populateDesignParameters includes DOCUMENT_ID.
    *
-   * @throws Exception if reflective invocation fails
    */
   @Test
-  void testPopulateDesignParametersIncludesDocumentId() throws Exception {
+  void testPopulateDesignParametersIncludesDocumentId() {
     HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertEquals(DOC_123, params.get("DOCUMENT_ID"));
   }
@@ -150,10 +158,9 @@ class ReportManagerCustomTest {
   /**
    * Verifies that populateDesignParameters includes BASE_ATTACH.
    *
-   * @throws Exception if reflective invocation fails
    */
   @Test
-  void testPopulateDesignParametersIncludesBaseAttach() throws Exception {
+  void testPopulateDesignParametersIncludesBaseAttach() {
     HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertEquals(FTP_DIRECTORY, params.get("BASE_ATTACH"));
   }
@@ -161,10 +168,9 @@ class ReportManagerCustomTest {
   /**
    * Verifies that populateDesignParameters includes BASE_WEB.
    *
-   * @throws Exception if reflective invocation fails
    */
   @Test
-  void testPopulateDesignParametersIncludesBaseWeb() throws Exception {
+  void testPopulateDesignParametersIncludesBaseWeb() {
     HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertEquals(REPLACE_WITH_FULL, params.get("BASE_WEB"));
   }
@@ -172,10 +178,9 @@ class ReportManagerCustomTest {
   /**
    * Verifies that populateDesignParameters includes BASE_DESIGN with correct path.
    *
-   * @throws Exception if reflective invocation fails
    */
   @Test
-  void testPopulateDesignParametersIncludesBaseDesign() throws Exception {
+  void testPopulateDesignParametersIncludesBaseDesign() {
     HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertEquals(PREFIX + "/" + DESIGN_VALUE + "/" + DEFAULT_DESIGN_VALUE, params.get("BASE_DESIGN"));
   }
@@ -183,10 +188,9 @@ class ReportManagerCustomTest {
   /**
    * Verifies that IS_IGNORE_PAGINATION is set to false.
    *
-   * @throws Exception if reflective invocation fails
    */
   @Test
-  void testPopulateDesignParametersSetsIgnorePaginationFalse() throws Exception {
+  void testPopulateDesignParametersSetsIgnorePaginationFalse() {
     HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertFalse((Boolean) params.get("IS_IGNORE_PAGINATION"));
   }
@@ -194,10 +198,9 @@ class ReportManagerCustomTest {
   /**
    * Verifies that LANGUAGE parameter is set from variables.
    *
-   * @throws Exception if reflective invocation fails
    */
   @Test
-  void testPopulateDesignParametersSetsLanguage() throws Exception {
+  void testPopulateDesignParametersSetsLanguage() {
     HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertEquals(LANG_EN_US, params.get("LANGUAGE"));
   }
@@ -205,10 +208,9 @@ class ReportManagerCustomTest {
   /**
    * Verifies that LOCALE parameter is derived from language string.
    *
-   * @throws Exception if reflective invocation fails
    */
   @Test
-  void testPopulateDesignParametersSetsLocale() throws Exception {
+  void testPopulateDesignParametersSetsLocale() {
     HashMap<String, Object> params = invokePopulateWithDefaults("es_ES", null);
     Locale locale = (Locale) params.get("LOCALE");
     assertEquals("es", locale.getLanguage());
@@ -218,10 +220,9 @@ class ReportManagerCustomTest {
   /**
    * Verifies that NUMBERFORMAT parameter is created.
    *
-   * @throws Exception if reflective invocation fails
    */
   @Test
-  void testPopulateDesignParametersSetsNumberFormat() throws Exception {
+  void testPopulateDesignParametersSetsNumberFormat() {
     HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertNotNull(params.get("NUMBERFORMAT"));
   }
@@ -229,10 +230,9 @@ class ReportManagerCustomTest {
   /**
    * Verifies that template info parameters are included when templateInfo is not null.
    *
-   * @throws Exception if reflective invocation fails
    */
   @Test
-  void testPopulateDesignParametersIncludesTemplateInfo() throws Exception {
+  void testPopulateDesignParametersIncludesTemplateInfo() {
     TemplateInfo mockTemplateInfo = mock(TemplateInfo.class);
     when(mockTemplateInfo.getShowLogo()).thenReturn("Y");
     when(mockTemplateInfo.getShowCompanyData()).thenReturn("N");
@@ -249,10 +249,9 @@ class ReportManagerCustomTest {
   /**
    * Verifies that template info parameters are absent when templateInfo is null.
    *
-   * @throws Exception if reflective invocation fails
    */
   @Test
-  void testPopulateDesignParametersExcludesTemplateInfoWhenNull() throws Exception {
+  void testPopulateDesignParametersExcludesTemplateInfoWhenNull() {
     HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertFalse(params.containsKey("SHOW_LOGO"));
     assertFalse(params.containsKey("SHOW_COMPANYDATA"));
@@ -262,10 +261,9 @@ class ReportManagerCustomTest {
   /**
    * Verifies that the parameter map contains the expected number of entries without template info.
    *
-   * @throws Exception if reflective invocation fails
    */
   @Test
-  void testPopulateDesignParametersCountWithoutTemplateInfo() throws Exception {
+  void testPopulateDesignParametersCountWithoutTemplateInfo() {
     HashMap<String, Object> params = invokePopulateWithDefaults(LANG_EN_US, null);
     assertEquals(10, params.size());
   }
@@ -273,10 +271,9 @@ class ReportManagerCustomTest {
   /**
    * Verifies that the parameter map contains the expected number of entries with template info.
    *
-   * @throws Exception if reflective invocation fails
    */
   @Test
-  void testPopulateDesignParametersCountWithTemplateInfo() throws Exception {
+  void testPopulateDesignParametersCountWithTemplateInfo() {
     TemplateInfo mockTemplateInfo = mock(TemplateInfo.class);
     when(mockTemplateInfo.getShowLogo()).thenReturn("Y");
     when(mockTemplateInfo.getShowCompanyData()).thenReturn("N");
@@ -312,11 +309,9 @@ class ReportManagerCustomTest {
    * @param templateInfo
    *     the template info to set on the mock report, may be {@code null}
    * @return the populated design parameters map
-   * @throws Exception
-   *     if reflective invocation fails
    */
   private HashMap<String, Object> invokePopulateWithDefaults(String language,
-      TemplateInfo templateInfo) throws Exception {
+      TemplateInfo templateInfo) {
     Report mockReport = mock(Report.class);
     VariablesSecureApp mockVars = createMockVariables(language);
     when(mockReport.getDocumentId()).thenReturn(ReportManagerCustomTest.DOC_123);
@@ -350,15 +345,18 @@ class ReportManagerCustomTest {
    * @param variables the variables to pass to the method
    * @param report the report to pass to the method
    * @return the resulting design parameters map
-   * @throws Exception if reflective invocation fails
    */
   @SuppressWarnings("unchecked")
   private HashMap<String, Object> invokePopulateDesignParameters(VariablesSecureApp variables,
-      Report report) throws Exception {
-    Method method = ReportManagerCustom.class.getDeclaredMethod("populateDesignParameters",
-        VariablesSecureApp.class, Report.class);
-    method.setAccessible(true);
-    return (HashMap<String, Object>) method.invoke(reportManagerCustom, variables, report);
+      Report report) {
+    try {
+      Method method = ReportManagerCustom.class.getDeclaredMethod("populateDesignParameters",
+          VariablesSecureApp.class, Report.class);
+      method.setAccessible(true);
+      return (HashMap<String, Object>) method.invoke(reportManagerCustom, variables, report);
+    } catch (ReflectiveOperationException exception) {
+      throw new TestReflectionException("Unable to invoke populateDesignParameters", exception);
+    }
   }
 
   /**
@@ -366,9 +364,8 @@ class ReportManagerCustomTest {
    *
    * @param fieldName the name of the private field
    * @return the field value
-   * @throws Exception if reflective access fails
    */
-  private String getPrivateField(String fieldName) throws Exception {
+  private String getPrivateField(String fieldName) {
     return getPrivateField(reportManagerCustom, fieldName);
   }
 
@@ -378,24 +375,29 @@ class ReportManagerCustomTest {
    * @param instance the {@link ReportManagerCustom} instance to read from
    * @param fieldName the name of the private field
    * @return the field value
-   * @throws Exception if reflective access fails
    */
-  private String getPrivateField(ReportManagerCustom instance, String fieldName) throws Exception {
-    Field field = ReportManagerCustom.class.getDeclaredField(fieldName);
-    field.setAccessible(true);
-    return (String) field.get(instance);
+  private String getPrivateField(ReportManagerCustom instance, String fieldName) {
+    try {
+      Field field = ReportManagerCustom.class.getDeclaredField(fieldName);
+      field.setAccessible(true);
+      return (String) field.get(instance);
+    } catch (ReflectiveOperationException exception) {
+      throw new TestReflectionException("Unable to read private field '" + fieldName + "'", exception);
+    }
   }
 
   /**
    * Retrieves a private field value as {@link Object} from the default test instance.
    *
    * @return the field value
-   * @throws Exception
-   *     if reflective access fails
    */
-  private Object getPrivateFieldObject() throws Exception {
-    Field field = ReportManagerCustom.class.getDeclaredField("_connectionProvider");
-    field.setAccessible(true);
-    return field.get(reportManagerCustom);
+  private Object getPrivateFieldObject() {
+    try {
+      Field field = ReportManagerCustom.class.getDeclaredField("_connectionProvider");
+      field.setAccessible(true);
+      return field.get(reportManagerCustom);
+    } catch (ReflectiveOperationException exception) {
+      throw new TestReflectionException("Unable to read private field '_connectionProvider'", exception);
+    }
   }
 }

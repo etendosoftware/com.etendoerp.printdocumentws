@@ -48,13 +48,24 @@ repositories {
     }
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDirs("etendo-resources")
+        }
+    }
+}
+
 /**
 * Declare Java dependencies using 'implementation'
 * Ex: implementation "com.sun.mail:javax.mail:1.6.2"
 */
 dependencies {
-
    implementation('com.smf:ws.printdocument:3.0.0')
    implementation('com.etendoerp.platform:etendo-core:[26.1.0,26.2.0)') 
 
+}
+
+test {
+    useJUnitPlatform()
 }

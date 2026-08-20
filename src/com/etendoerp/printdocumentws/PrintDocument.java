@@ -48,17 +48,18 @@ public class PrintDocument extends com.smf.ws.printdocument.PrintDocument {
 
                 if (orderProformaNumber != null) {
                         documentType = DocumentType.SALESORDER;
-                        customDocuments.addAll(getOrder(orderProformaNumber, orgId, isPurchase));
+                        addDocuments(customDocuments, getOrder(orderProformaNumber, orgId, isPurchase),
+                            documentType);
                 }
                 if (shipmentValuedNumber != null) {
                         documentType = DocumentType.SHIPMENT;
-                        customDocuments.addAll(
-                            getShipment(shipmentValuedNumber, orgId, isPurchase));
+                        addDocuments(customDocuments,
+                            getShipment(shipmentValuedNumber, orgId, isPurchase), documentType);
                 }
                 if (quotationProformaNumber != null) {
                         documentType = DocumentType.QUOTATION;
-                        customDocuments.addAll(
-                            getQuotation(quotationProformaNumber, orgId, isPurchase));
+                        addDocuments(customDocuments,
+                            getQuotation(quotationProformaNumber, orgId, isPurchase), documentType);
                 }
 
                 if (customDocuments != null && customDocuments.size() > 0) {
